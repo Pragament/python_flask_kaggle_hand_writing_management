@@ -1,0 +1,1 @@
+# python_flask_kaggle_hand_writing_management
