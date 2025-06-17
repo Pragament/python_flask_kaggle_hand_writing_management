@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Handwritten Dataset Viewer</title>
+    <style>
+        body { font-family: Arial; text-align: center; }
+        img { width: 100px; height: 100px; margin: 5px; border: 1px solid #ccc; }
+        .image-grid { display: flex; flex-wrap: wrap; justify-content: center; }
+        .image-item { margin: 10px; text-align: center; }
+    </style>
+    <script>
+        function confirmDelete() {
+            return confirm("Are you sure you want to delete the selected images?");
+        }
+    </script>
+</head>
+<body>
+    <h2>Select Dataset Type and Label</h2>
+    <form method="POST" action="/" id="filterForm">
+        <label for="dataset_type">Dataset Type:</label>
+        <select name="dataset_type" id="dataset_type" onchange="document.getElementById('filterForm').submit();">
+            <option value="">--Select--</option>
+            <option value="alphabet" {% if dataset_type == 'alphabet' %}selected{% endif %}>Alphabet</option>
+            <option value="digit" {% if dataset_type == 'digit' %}selected{% endif %}>Digit</option>
+        </select>
+
+        {% if dataset_type %}
+        <label for="label">{{ dataset_type.title() }}:</label>
+        <select name="label" id="label">
+            <option value="">--Choose--</option>
+            {% if dataset_type == 'alphabet' %}
+                {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+                    <option value="{{ letter }}" {% if selected_label == letter %}selected{% endif %}>{{ letter }}</option>
+                {% endfor %}
+            {% elif dataset_type == 'digit' %}
+                {% for digit in range(10) %}
+                    <option value="{{ digit }}" {% if selected_label == digit|string %}selected{% endif %}>{{ digit }}</option>
+                {% endfor %}
+            {% endif %}
+        </select>
+        <input type="submit" value="Show Images">
+        {% endif %}
+    </form>
+
+    {% if image_paths %}
+    <h3>Images for {{ dataset_type.title() }} {{ selected_label }}</h3>
+    <form method="POST" action="/delete" onsubmit="return confirmDelete();">
+        <input type="hidden" name="dataset_type" value="{{ dataset_type }}">
+        <input type="hidden" name="label" value="{{ selected_label }}">
+        <div class="image-grid">
+            {% for img_path in image_paths %}
+                <div class="image-item">
+                    <img src="{{ url_for('static', filename=img_path) }}" alt="{{ selected_label }}">
+                    <br>
+                    <input type="checkbox" name="selected_images" value="{{ img_path }}">
+                </div>
+            {% endfor %}
+        </div>
+        <br>
+        <button type="submit">Remove Selected</button>
+    </form>
+    {% elif dataset_type and selected_label %}
+        <p>No images found for {{ dataset_type.title() }} {{ selected_label }}</p>
+    {% endif %}
+</body>
+</html>
