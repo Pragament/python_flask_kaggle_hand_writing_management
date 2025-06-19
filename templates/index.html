@@ -7,10 +7,62 @@
         img { width: 100px; height: 100px; margin: 5px; border: 1px solid #ccc; }
         .image-grid { display: flex; flex-wrap: wrap; justify-content: center; }
         .image-item { margin: 10px; text-align: center; }
+        .button-group { margin: 20px; }
+        .inline-form { display: inline-block; margin-left: 10px; }
+        .prediction-text { font-weight: bold; color: green; display: block; margin-top: 5px; }
     </style>
     <script>
         function confirmDelete() {
             return confirm("Are you sure you want to delete the selected images?");
+        }
+
+        function testImages() {
+            const selectedCheckboxes = document.querySelectorAll('input[name="selected_images"]:checked');
+            const selectedImages = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            if (selectedImages.length === 0) {
+                alert("Please select images to test.");
+                return;
+            }
+
+            fetch('/test_images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: selectedImages })
+            })
+                .then(res => res.json())
+                .then(predictions => {
+                    for (const [imgPath, prediction] of Object.entries(predictions)) {
+                        const item = document.querySelector(`.image-item[data-img-path="${imgPath}"]`);
+                        if (item) {
+                            const predEl = item.querySelector('.prediction-text');
+                            predEl.textContent = `Predicted: ${prediction}`;
+                        }
+                    }
+                })
+                .catch(err => {
+                    alert("Prediction failed. Make sure the model is downloaded.");
+                    console.error(err);
+                });
+        }
+
+        function downloadModel() {
+            const datasetType = document.getElementById('dataset_type').value;
+            const label = document.getElementById('label')?.value;
+
+            fetch('/download_model', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataset_type: datasetType, label: label })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('model-status').innerText = data.message;
+                })
+                .catch(error => {
+                    document.getElementById('model-status').innerText = '❌ Download failed.';
+                    console.error('Error:', error);
+                });
         }
     </script>
 </head>
@@ -20,8 +72,8 @@
         <label for="dataset_type">Dataset Type:</label>
         <select name="dataset_type" id="dataset_type" onchange="document.getElementById('filterForm').submit();">
             <option value="">--Select--</option>
-            <option value="alphabet" {% if dataset_type == 'alphabet' %}selected{% endif %}>Alphabet</option>
-            <option value="digit" {% if dataset_type == 'digit' %}selected{% endif %}>Digit</option>
+            <option value="alphabet" {% if dataset_type=='alphabet' %}selected{% endif %}>Alphabet</option>
+            <option value="digit" {% if dataset_type=='digit' %}selected{% endif %}>Digit</option>
         </select>
 
         {% if dataset_type %}
@@ -30,17 +82,26 @@
             <option value="">--Choose--</option>
             {% if dataset_type == 'alphabet' %}
                 {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-                    <option value="{{ letter }}" {% if selected_label == letter %}selected{% endif %}>{{ letter }}</option>
+                    <option value="{{ letter }}" {% if selected_label==letter %}selected{% endif %}>{{ letter }}</option>
                 {% endfor %}
             {% elif dataset_type == 'digit' %}
                 {% for digit in range(10) %}
-                    <option value="{{ digit }}" {% if selected_label == digit|string %}selected{% endif %}>{{ digit }}</option>
+                    <option value="{{ digit }}" {% if selected_label==digit|string %}selected{% endif %}>{{ digit }}</option>
                 {% endfor %}
             {% endif %}
         </select>
         <input type="submit" value="Show Images">
         {% endif %}
     </form>
+
+    <div class="button-group">
+        <button onclick="downloadModel()">📥 Download Model</button>
+        <span id="model-status"></span>
+
+        <form class="inline-form" onsubmit="event.preventDefault(); testImages();">
+            <button type="submit">🧪 Test Selected</button>
+        </form>
+    </div>
 
     {% if image_paths %}
     <h3>Images for {{ dataset_type.title() }} {{ selected_label }}</h3>
@@ -49,11 +110,12 @@
         <input type="hidden" name="label" value="{{ selected_label }}">
         <div class="image-grid">
             {% for img_path in image_paths %}
-                <div class="image-item">
-                    <img src="{{ url_for('static', filename=img_path) }}" alt="{{ selected_label }}">
-                    <br>
-                    <input type="checkbox" name="selected_images" value="{{ img_path }}">
-                </div>
+            <div class="image-item" data-img-path="{{ img_path }}">
+                <img src="{{ url_for('static', filename=img_path) }}" alt="{{ selected_label }}">
+                <br>
+                <input type="checkbox" name="selected_images" value="{{ img_path }}">
+                <span class="prediction-text"></span>
+            </div>
             {% endfor %}
         </div>
         <br>
