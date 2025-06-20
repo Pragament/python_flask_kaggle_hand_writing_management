@@ -14,6 +14,7 @@ A Python Flask web application for managing, viewing, testing, and deleting hand
 - ❌ Delete selected dataset images
 - ⚡ Dynamic frontend using Flask & JavaScript
 
+
 ---
 
 ## 🛠️ Setup Instructions
