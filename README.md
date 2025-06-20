@@ -1,77 +1,100 @@
+
 # python_flask_kaggle_hand_writing_management
-This Flask-based web application allows you to manage handwritten image datasets (digits and alphabets), delete selected images, download a pre-trained digit classification model from Kaggle, and run predictions on selected digit images using that model.
+
+A Python Flask web application for managing, viewing, testing, and deleting handwritten digit and alphabet datasets. Users can interactively select dataset types, download pretrained models from Kaggle, and test handwritten digit images using a pre-trained deep learning model.
 
 ---
 
-## 💡 Features
+## 🚀 Features
 
-- 📥 **Download Dataset**: Automatically fetches from Kaggle (`krsanjeev333/alphabets-digits`)
-- 👁️ **View Images**: Filter images by dataset type (digit/alphabet) and label (0-9 or A-Z)
-- 🗑️ **Delete Images**: Select and remove unwanted images directly from the UI
-- 🤖 **Download Model**: One-click download of a pre-trained digit classifier (`nums_model.keras`)
-- 🧪 **Test Digits**: Run predictions on selected digit images using the downloaded model
-- 🧠 **Inline Predictions**: Shows predicted digit next to each image after testing
+- 📁 View datasets (Alphabets & Digits)
+- ✅ Select & test specific images
+- 🧠 Download a Kaggle-hosted digit recognition model (`nums_model.keras`)
+- 📸 Predict digits from uploaded/tested images using the model
+- ❌ Delete selected dataset images
+- ⚡ Dynamic frontend using Flask & JavaScript
 
 ---
+
 
 ## 🛠️ Setup Instructions
 
-### 1. Clone the Repository
-
+### 1. Clone this Repository
 ```bash
-git clone <your-repo-url>
-cd handwritten-digit-classifier
+git clone https://github.com/yourusername/python_flask_kaggle_hand_writing_management.git
+cd python_flask_kaggle_hand_writing_management
 ```
 
-### 2. Install Python Dependencies
-
+### 2. Create a Virtual Environment
 ```bash
-pip install flask tensorflow pillow kagglehub
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-### 3. Configure Kaggle API
-
-Download your Kaggle API key from your [Kaggle account](https://www.kaggle.com/account) and place the `kaggle.json` in the appropriate directory:
-
+### 3. Install Dependencies
 ```bash
-# Windows:
-C:\Users\<YourUsername>\.kaggle\kaggle.json
-
-# macOS/Linux:
-~/.kaggle/kaggle.json
+pip install -r requirements.txt
 ```
+
+### 4. Setup Kaggle API
+- Place your `kaggle.json` API key in:
+  ```bash
+  C:\Users\<YourUsername>\.kaggle\kaggle.json
+  ```
+- Or set the environment variable:
+  ```bash
+  export KAGGLE_USERNAME=your_username
+  export KAGGLE_KEY=your_key
+  ```
 
 ---
 
-## 🚀 Run the App
+## ▶️ Run the App
 
 ```bash
 python app.py
 ```
 
-Then open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
+Visit `http://127.0.0.1:5000` in your browser.
 
 ---
 
-## 🧠 Model Info
+## 📦 Downloading the Model
 
-The model is downloaded from:
+The model used (`nums_model.keras`) is downloaded from:
 
-- [🔗 pragament/digit-classifier-100-accuracy](https://www.kaggle.com/models/pragament/digit-classifier-100-accuracy/Keras/default?select=nums_model.keras)
+- https://www.kaggle.com/models/pragament/digit-classifier-100-accuracy
 
-**Model input:** `224x224 RGB`  
-If the image is grayscale or a different size, it is automatically preprocessed.
+It will be saved under `static/model/` and automatically checked for existence to prevent redownload.
+
+---
+
+## 🧪 Testing Digits
+
+- Select digit images and click "🧪 Test Selected"
+- The model will return predictions for selected images
+- Predictions are shown beside each image
 
 ---
 
-## 🧪 Testing Flow
+## 📂 Dataset Source
 
-- Select one or more digit images
-- Click **🧪 Test Selected**
-- The app preprocesses the image and feeds it to the model
-- The prediction is shown next to each image like:  
-  ✅ Predicted: 3
-
-> ⚠️ Currently optimized for **digit recognition only** (0–9)
+- Kaggle Dataset: https://www.kaggle.com/datasets/krsanjeev333/alphabets-digits
 
 ---
+
+## 📋 requirements.txt
+
+```
+Flask
+tensorflow
+Pillow
+kaggle
+kagglehub
+```
+
+---
+
+## 📄 License
+
+This project is under the MIT License.
