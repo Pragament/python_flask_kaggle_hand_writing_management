@@ -1,0 +1,17 @@
+# Flask: Web framework for the app
+flask==2.3.2
+
+# Kaggle API: For downloading datasets and models
+kaggle>=1.5.12
+kagglehub>=0.1.6
+
+# Core dependencies for preprocessing and testing
+numpy>=1.21.0
+pillow>=9.0.0
+opencv-python>=4.5.5.64
+scikit-learn>=1.1.1
+matplotlib>=3.5.2
+requests>=2.27.1
+
+# TensorFlow for loading and using the trained model
+tensorflow>=2.12.0
